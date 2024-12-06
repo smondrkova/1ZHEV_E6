@@ -17,7 +17,7 @@ public class DebugMenuUI : MonoBehaviour
 #region Internal
 
     /// <summary> Dimensions of the main window. </summary>
-    private static Vector2 WINDOW_DIMENSION = new Vector2(256.0f, 192.0f);
+    private static Vector2 WINDOW_DIMENSION = new Vector2(256.0f, 256.0f);
     /// <summary> Base padding used within the UI. </summary>
     private static float BASE_PADDING = 8.0f;
 
@@ -138,10 +138,21 @@ public class DebugMenuUI : MonoBehaviour
                     { InventoryManager.Instance.availableCurrency = currency; }
                  */
                 
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("Currency: ", GUILayout.Width(WINDOW_DIMENSION.x / 4.0f));
+                    var currency = InventoryManager.Instance.availableCurrency;
+                    currency = (int) GUILayout.HorizontalSlider(currency, 0.0f, 1000.0f, 
+                        GUILayout.ExpandWidth(true));
+                    if (GUI.changed)
+                    {
+                        InventoryManager.Instance.availableCurrency = currency;
+                    }
+                }
+                GUILayout.EndHorizontal();
                 
                 
-                
-                
+                    
                 /*
                  * Task 3c: The Tool
                  *
@@ -165,9 +176,34 @@ public class DebugMenuUI : MonoBehaviour
                  * be controlled from the Cheat Console.
                  */
                 
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("Interactive Mode: ", GUILayout.Width(WINDOW_DIMENSION.x / 4.0f));
+                    GameManager.Instance.interactiveMode = GUILayout.Toggle(
+                        GameManager.Instance.interactiveMode, "Enable", 
+                        GUILayout.ExpandWidth(true)
+                    );
+                }
+                GUILayout.EndHorizontal();
                 
-                
-                
+                GUILayout.Label("Volume: ", GUILayout.Width(WINDOW_DIMENSION.x / 4.0f));
+                SoundManager.Instance.masterVolume = GUILayout.HorizontalSlider(
+                    SoundManager.Instance.masterVolume, -80.0f, 20.0f, 
+                    GUILayout.ExpandWidth(true)
+                );
+
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("Mute: ", GUILayout.Width(WINDOW_DIMENSION.x / 4.0f));
+                    bool isMuted = GUILayout.Toggle(SoundManager.Instance.masterMuted, "Mute", GUILayout.ExpandWidth(true));
+                    if (isMuted != SoundManager.Instance.masterMuted)
+                    {
+                        SoundManager.Instance.masterMuted = isMuted;
+                    }
+                }
+                GUILayout.EndHorizontal();
+
+
                 
                 // Placing the elements next to each other.
                 GUILayout.BeginHorizontal();
@@ -196,7 +232,7 @@ public class DebugMenuUI : MonoBehaviour
                     if (GUILayout.Button("Enable\nDummy\nCharacter", 
                         GUILayout.ExpandWidth(true), 
                         GUILayout.ExpandHeight(true)))
-                    { /* Fill the code here! */ }
+                    { GameManager.Instance.TogglePlayerCharacter(); }
                 }
                 GUILayout.EndHorizontal();
                 // Do not forget to end each group in the correct order!
