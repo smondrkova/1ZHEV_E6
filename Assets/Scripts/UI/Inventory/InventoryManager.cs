@@ -154,6 +154,9 @@ public class InventoryManager : MonoBehaviour
          * be called.
          */
         
+        mItemCreateButton = itemDetails.Q<Button>("ItemDetailButtonCreate");
+        mItemCreateButton.clicked += () => CreateItem();
+        
         
         
         
@@ -389,9 +392,25 @@ public class InventoryManager : MonoBehaviour
         
         if (item == null)
         { // We have no item selected -> Provide some default information.
+            mItemDetailName.text = "No item selected";
+            mItemDetailDescription.text = "Select an item to see its details.";
+            mItemDetailCost.text = "0";
+            mItemCreateButton.SetEnabled(false);
         }
         else
         { // We have item selected -> Use the item information.
+            mItemDetailName.text = item.definition.readableName;
+            mItemDetailDescription.text = item.definition.readableDescription;
+            mItemDetailCost.text = $"{item.definition.cost}";
+            
+            if (item.definition.cost <= availableCurrency)
+            {
+                mItemCreateButton.SetEnabled(true);
+            }
+            else
+            {
+                mItemCreateButton.SetEnabled(false);
+            }
         }
         
         selectedItem = item;
@@ -425,8 +444,29 @@ public class InventoryManager : MonoBehaviour
          * These items are not cheap to make!
          */
         
-        var itemDefinition = selectedItem?.definition;
+        if (selectedItem == null)
+        { return false; }
         
-        return false;
+        var itemDefinition = selectedItem?.definition;
+
+        var newItem = Instantiate(itemDefinition.prefab, createDestination.transform);
+        if (newItem == null)
+        { return false; }
+        
+        if (itemDefinition.cost > availableCurrency)
+        { return false; }
+        
+        availableCurrency -= itemDefinition.cost;
+        
+        if (itemDefinition.cost <= availableCurrency)
+        {
+            mItemCreateButton.SetEnabled(true);
+        }
+        else
+        {
+            mItemCreateButton.SetEnabled(false);
+        }
+
+        return true;
     }
 }
